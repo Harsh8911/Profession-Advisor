@@ -1,209 +1,119 @@
-<?php 
-include("config.php");
-$error="";
-$msg="";
-if(isset($_POST['send']))
-{
-	$name=$_POST['name'];
-	$email=$_POST['email'];
-	$phone=$_POST['phone'];
-	$subject=$_POST['subject'];
-	$message=$_POST['message'];
-	
-	if(!empty($name) && !empty($email) && !empty($phone) && !empty($subject) && !empty($message))
-	{
-		
-		$sql="INSERT INTO contact (name,email,phone,subject,message) VALUES ('$name','$email','$phone','$subject','$message')";
-		   $result=mysqli_query($con, $sql);
-		   if($result){
-			   $msg = "<p class='alert alert-success'>Message Send Successfully</p> ";
-		   }
-		   else{
-			   $error = "<p class='alert alert-warning'>Message Not Send Successfully</p> ";
-		   }
-	}else{
-		$error = "<p class='alert alert-warning'>Please Fill all the fields</p>";
-	}
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<!-- Required meta tags -->
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
 
-<!-- Meta Tags -->
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link rel="shortcut icon" href="images/favicon.ico">
-
-<!--	Fonts
-	========================================================-->
-	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,500,600,700&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flaticon@1.0.0/dist/flaticon.css">
-    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-
-<!--	Css Link
-	========================================================-->
-<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="css/bootstrap-slider.css">
-<link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
-<link rel="stylesheet" type="text/css" href="css/layerslider.css">
-<link rel="stylesheet" type="text/css" href="css/color.css" id="color-change">
-<link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
-<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="fonts/flaticon/flaticon.css">
-<link rel="stylesheet" type="text/css" href="css/style.css">
-
-<!--	Title
-	=========================================================-->
-<title>Profession Advisor </title>
+    <style>
+        /* For demonstration purposes, you can remove this style tag and link your external CSS file */
+        .map {
+            width: 100%;
+            height: 300px;
+        }
+         /* Custom CSS for Loader */
+         .loader {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+        }
+    </style>
+     <script>
+        // JavaScript to handle loader visibility
+        document.addEventListener("DOMContentLoaded", function() {
+            const loader = document.getElementById('loader');
+            setTimeout(function() {
+                loader.style.display = 'none';
+            }, 1000); // Hides the loader after 1 second
+        });
+    </script>
 </head>
+
 <body>
+      <!-- Loader HTML -->
+  <div id="loader" class="loader-overlay">
+        <div class="loader"></div>
+    </div>
+    <header class="text-white-600 body-font" style="background-color: black; font-family: Oswald, sans-serif">
+        <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+            <a class="flex title-font font-medium items-center text-white-900 mb-4 md:mb-0">
+                <img src="./img/logo.png" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="width: 208px; height: auto; max-height: 80px;">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </a>
+            <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center" style="color: white; font-size:large">
+  <a class="mr-6 hover:text-blue-900" href="index.php">Home</a>
+  <a class="mr-6 hover:text-blue-900" href="index.php#about">About</a>
+  <a class="mr-6 hover:text-blue-900" href="contact.php">Contact</a>
+  <a class="mr-6 hover:text-blue-900" href="index.php#services">Services</a>
+</nav>
+        </div>
+    </header>
+    <div class="container mx-auto py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-2xl font-bold mb-4">Location</h2>
+                <!-- Google Maps iframe -->
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d60001.67761277958!2d73.5947295!3d19.9620923!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdded43e382f8c7%3A0x5cb37e903f1154f3!2sSandip%20foundation!5e0!3m2!1sen!2sin!4v1718280122790!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" class="map"></iframe>
 
-<!--	Page Loader
-=============================================================--> 
-<div class="page-loader position-fixed z-index-9999 w-100 bg-white vh-100">
-	<div class="d-flex justify-content-center y-middle position-relative">
-	  <div class="spinner-border" role="status">
-		<span class="sr-only">Loading...</span>
-	  </div>
-	</div>
-</div>
-
-<div id="page-wrapper">
-    <div class="row"> 
-        <!--	Header start  -->
-		<?php include("header.php");?>
-        <!--	Header end  -->
-        
-        <!--	Banner -->
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2 class="page-name float-left text-white text-uppercase mt-1 mb-0"><b>Contact</b></h2>
-                    </div>
-                    <div class="col-md-6">
-                        <nav aria-label="breadcrumb" class="float-left float-md-right">
-                            <ol class="breadcrumb bg-transparent m-0 p-0">
-                                <li class="breadcrumb-item text-black"><a href="index.php">Home</a></li>
-                                <li class="breadcrumb-item active">Contact</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
             </div>
-        <!--	Banner -->
-        <!--	Contact Information -->
-        <div class="full-row">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-4 mb-5 bg-secondary">
-                        <div class="contact-info">
-                            <h3 class="mb-4 mt-4 text-white">Contacts</h3>
-							
-                            <ul>
-                                <li class="d-flex mb-4"> <i class="fas fa-map-marker-alt text-white mr-2 font-13 mt-1"></i>
-                                    <div class="contact-address">
-                                        <h5 class="text-white">Address</h5>
-                                        <span class="text-white">Sandip Foundation, Nashik</span> <br>
-																				</div>
-                                </li>
-                                <li class="d-flex mb-4"> <i class="fas fa-phone-alt text-white mr-2 font-13 mt-1"></i>
-                                    <div class="contact-address">
-                                        <h5 class="text-white">Call Us</h5>
-                                        <span class="d-table text-white">+91 8010545021</span>
-										<span class="text-white">+91 9767854525 </span>
-									</div>
-                                </li>
-                                <li class="d-flex mb-4"> <i class="fas fa-envelope text-white mr-2 font-13 mt-1"></i>
-                                    <div class="contact-address">
-                                        <h5 class="text-white">Email Address</h5>
-										<a href="mailto:professionAdvisor@gmail.com"><span class="d-table text-white">professionAdvisor@gmail.com</span>
-										<span class="text-white">professionAdvisor@gmail.com</span></a>
-										</div>
-                                </li>
-                            </ul>
-                        </div>
+            <div>
+                <h2 class="text-2xl font-bold mb-4">Get In Touch</h2>
+                <form action="submit_contact.php" method="POST" class="space-y-4">
+                    <div>
+                        <label for="name" class="block font-bold">Your Name*</label>
+                        <input type="text" id="name" name="name" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                     </div>
-					<div class="col-lg-1"></div>
-                    <div class="col-md-12 col-lg-7">
-						<div class="container">
-                        <div class="row">
-							<div class="col-lg-12">
-								<h2 class="text-secondary double-down-line text-center mb-5">Get In Touch</h2>
-								<?php echo $msg; ?><?php echo $error; ?>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<form class="w-100" action="#" method="post">
-									<div class="row">
-										<div class="row mb-4">
-											<div class="form-group col-lg-6">
-												<input type="text"  name="name" class="form-control" placeholder="Your Name*">
-											</div>
-											<div class="form-group col-lg-6">
-												<input type="text"  name="email" class="form-control" placeholder="Email Address*">
-											</div>
-											<div class="form-group col-lg-6">
-												<input type="text"  name="phone" class="form-control" placeholder="Phone" maxlength="10">
-											</div>
-											<div class="form-group col-lg-6">
-												<input type="text" name="subject"  class="form-control" placeholder="Subject">
-											</div>
-											<div class="col-lg-12">
-												<div class="form-group">
-													<textarea name="message" class="form-control" rows="5" placeholder="Type Comments..."></textarea>
-												</div>
-											</div>
-										</div>
-										<button type="submit" value="send message" name="send" class="btn btn-success">Send Message</button>
-									</div>
-								</form>
-							</div>
-						</div>
-						</div>
-					</div>
-                </div>
+                    <div>
+                        <label for="email" class="block font-bold">Email Address*</label>
+                        <input type="email" id="email" name="email" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="phone" class="block font-bold">Phone*</label>
+                        <input type="tel" id="phone" name="phone" pattern="\+91 [0-9]{5} [0-9]{5}" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="+91 " required>
+
+<script>
+    document.getElementById('phone').addEventListener('input', function (e) {
+        var x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,5})/);
+        e.target.value = '+' + (x[1] || '91') + ' ' + (x[2] || '') + (x[3] ? ' ' + x[3] : '');
+    });
+</script>
+                    </div>
+                    <div>
+                        <label for="subject" class="block font-bold">Subject</label>
+                        <input type="text" id="subject" name="subject" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="message" class="block font-bold">Comments</label>
+                        <textarea id="message" name="message" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required></textarea>
+                    </div>
+                    <button type="submit" class="bg-indigo-500 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-600 transition duration-300">Submit</button>
+                </form>
             </div>
         </div>
-        <!--	Contact Inforamtion -->
-        
-        <!--	Map -->
-		<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3750.10485124011!2d73.66837227500123!3d19.962092281433637!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdded43e382f8c7%3A0x5cb37e903f1154f3!2sSandip%20foundation!5e0!3m2!1sen!2sin!4v1713613944578!5m2!1sen!2sin" width="1900" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>     
-			 <!--	Footer   start-->
-		<?php include("footer.php");?>
-		<!--	Footer   start-->
-        
-        <!-- Scroll to top --> 
-        <a href="#" class="bg-secondary text-white hover-text-secondary" id="scroll"><i class="fas fa-angle-up"></i></a> 
-        <!-- End Scroll To top --> 
     </div>
-</div>
-    
-
-   
-<script src="js/jquery.min.js"></script> 
-<!--jQuery Layer Slider --> 
-<script src="js/greensock.js"></script> 
-<script src="js/layerslider.transitions.js"></script> 
-<script src="js/layerslider.kreaturamedia.jquery.js"></script> 
-<!--jQuery Layer Slider --> 
-<script src="js/popper.min.js"></script> 
-<script src="js/bootstrap.min.js"></script> 
-<script src="js/owl.carousel.min.js"></script> 
-<script src="js/tmpl.js"></script> 
-<script src="js/jquery.dependClass-0.1.js"></script> 
-<script src="js/draggable-0.1.js"></script> 
-<script src="js/jquery.slider.js"></script> 
-<script src="js/wow.js"></script> 
-<script src="js/jquery.cookie.js"></script> 
-<script src="js/custom.js"></script>  
-
 </body>
+
 </html>

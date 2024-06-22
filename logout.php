@@ -1,14 +1,17 @@
 <?php
-// Initialize the session
 session_start();
- 
-// Unset all of the session variables
-$_SESSION = array();
- 
-// Destroy the session.
+
+// Unset all session variables
+session_unset();
+
+// Destroy the session
 session_destroy();
- 
-// Redirect to login page
-header("location: index.php");
+
+// Remove the user ID cookie (if set)
+if (isset($_COOKIE['user_id'])) {
+    setcookie('user_id', '', time() - 3600, '/'); // Expire the cookie one hour ago
+}
+
+// Redirect to the login page or any other desired page
+header('Location: index.php');
 exit;
-?>

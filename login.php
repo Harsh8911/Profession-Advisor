@@ -1,145 +1,239 @@
-<?php 
+<?php
 session_start();
-include("config.php");
-$error="";
-$msg="";
-if(isset($_REQUEST['login']))
-{
-	$email=$_REQUEST['email'];
-	$pass=$_REQUEST['pass'];
-	$pass= sha1($pass);
-	
-	if(!empty($email) && !empty($pass))
-	{
-		$sql = "SELECT * FROM user where uemail='$email' && upass='$pass'";
-		$result=mysqli_query($con, $sql);
-		$row=mysqli_fetch_array($result);
-		   if($row){
-			   
-				$_SESSION['uid']=$row['uid'];
-				$_SESSION['uemail']=$email;
-				header("location:index.php");
-				
-		   }
-		   else{
-			   $error = "<p class='alert alert-warning'>Email or Password doesnot match!</p> ";
-		   }
-	}else{
-		$error = "<p class='alert alert-warning'>Please Fill all the fields</p>";
-	}
+
+$servername = "localhost";
+$username = "id22342758_root";
+$password = "Advisor1@";
+$dbname = "id22342758_careerprof";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
+$errors = [];
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST["username"]);
+    $password = $_POST["password"];
+
+    if (empty($username)) {
+        $errors[] = "Username is required.";
+    }
+    if (empty($password)) {
+        $errors[] = "Password is required.";
+    }
+
+    if (empty($errors)) {
+        $sql = "SELECT id, password FROM users WHERE username = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->bind_result($user_id, $hashed_password);
+        $stmt->fetch();
+
+        if ($user_id && password_verify($password, $hashed_password)) {
+            $_SESSION["user_id"] = $user_id;
+
+            echo "<script>alert('Login successful!'); window.location.href = 'index.php';</script>";
+            exit();
+        } else {
+            $errors[] = "Invalid username or password.";
+        }
+
+        $stmt->close();
+    }
+}
+
+$conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<!-- Required meta tags -->
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-<!-- Meta Tags -->
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<link rel="shortcut icon" href="images/favicon.ico">
-
-<!--	Fonts
-	========================================================-->
-<link href="https://fonts.googleapis.com/css?family=Muli:400,400i,500,600,700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
-
-<!--	Css Link
-	========================================================-->
-<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="css/bootstrap-slider.css">
-<link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
-<link rel="stylesheet" type="text/css" href="css/layerslider.css">
-<link rel="stylesheet" type="text/css" href="css/color.css">
-<link rel="stylesheet" type="text/css" href="css/owl.carousel.min.css">
-<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="fonts/flaticon/flaticon.css">
-<link rel="stylesheet" type="text/css" href="css/style.css">
-<link rel="stylesheet" type="text/css" href="css/login.css">
- 
-<!--	Title 	-->
-<title>Profession Advisor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+         /* Custom CSS for Loader */
+         .loader {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+        }
+    </style>
+    <script>
+        // JavaScript to handle loader visibility
+        document.addEventListener("DOMContentLoaded", function() {
+            const loader = document.getElementById('loader');
+            setTimeout(function() {
+                loader.style.display = 'none';
+            }, 1000); // Hides the loader after 1 second
+        });
+    </script>
 </head>
-<body>
+  <!-- Loader HTML -->
+  <div id="loader" class="loader-overlay">
+        <div class="loader"></div>
+    </div>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+<div class="w-full max-w-md">
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <h2 class="text-2xl mb-4 text-center">Login</h2>
 
-<!--	Page Loader--> 
-<div class="page-loader position-fixed z-index-9999 w-100 bg-white vh-100">
-	<div class="d-flex justify-content-center y-middle position-relative">
-	  <div class="spinner-border" role="status">
-		<span class="sr-only">Loading...</span>
-	  </div>
-	</div>
+        <?php if (!empty($errors)): ?>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                <ul>
+                    <?php foreach ($errors as $error): ?>
+                        <li><?php echo $error; ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <form action="login.php" method="post" id="loginForm">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="username" id="username" required>
+            </div>
+            <div class="mb-4 relative">
+    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+        Password
+        <button type="button" class="ml-2 text-blue-500 hover:text-blue-700" id="password-info">
+            <i class="fas fa-info-circle"></i>
+        </button>
+    </label>
+    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10" type="password" name="password" id="password" required>
+    <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 px-3 py-2 bg-transparent text-gray-700">
+        <i class="fas fa-eye" id="password-eye"></i>
+    </button>
 </div>
 
-
-
-<div id="page-wrapper">
-    <div class="row"> 
-        
-        <div class="page-wrappers login-body full-row bg-gray">
-            <div class="login-wrapper">
-            	<div class="container">
-                	<div class="loginbox">
-                        <div class="login-right">
-							<div class="login-right-wrap">
-								<h1>Login</h1>
-								<p class="account-subtitle">Access to our dashboard</p>
-								<?php echo $error; ?><?php echo $msg; ?>
-								<!-- Form -->
-								<form method="post">
-									<div class="form-group">
-										<input type="email"  name="email" class="form-control" placeholder="Your Email*">
-									</div>
-									<div class="form-group">
-										<input type="password" name="pass"  class="form-control" placeholder="Your Password">
-									</div>
-									
-										<button class="btn btn-success" name="login" value="Login" type="submit">Login</button>
-									
-								</form>
-								
-								<div class="login-or">
-									<span class="or-line"></span>
-									<span class="span-or">or</span>
-								</div>
-								 
-							
-								
-								<div class="text-center dont-have">Don't have an account? <a href="register.php">Register</a></div>
-								
-							</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- Password Info Popup -->
+<div id="password-popup" class="fixed inset-0 flex items-center justify-center hidden">
+    <div class="bg-white p-4 rounded-lg shadow-lg max-w-sm">
+        <h3 class="text-lg font-semibold mb-2">Password Requirements</h3>
+        <p class="text-sm text-gray-600 mb-4">
+            Password should be exactly 8 characters long, containing alphanumeric characters (both lowercase and uppercase).
+        </p>
+        <div class="text-center">
+            <button id="closePopup" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                Close
+            </button>
         </div>
-	<!--	login  -->
-        
-        <!-- Scroll to top --> 
-        <a href="#" class="bg-secondary text-white hover-text-secondary" id="scroll"><i class="fas fa-angle-up"></i></a> 
-        <!-- End Scroll To top --> 
     </div>
 </div>
-    
 
-   
-<script src="js/jquery.min.js"></script> 
-<!--jQuery Layer Slider --> 
-<script src="js/greensock.js"></script> 
-<script src="js/layerslider.transitions.js"></script> 
-<script src="js/layerslider.kreaturamedia.jquery.js"></script> 
-<!--jQuery Layer Slider --> 
-<script src="js/popper.min.js"></script> 
-<script src="js/bootstrap.min.js"></script> 
-<script src="js/owl.carousel.min.js"></script> 
-<script src="js/tmpl.js"></script> 
-<script src="js/jquery.dependClass-0.1.js"></script> 
-<script src="js/draggable-0.1.js"></script> 
-<script src="js/jquery.slider.js"></script> 
-<script src="js/wow.js"></script> 
-<script src="js/custom.js"></script>
+<script>
+    const popup = document.getElementById('password-popup');
+    const infoButton = document.getElementById('password-info');
+    const closeButton = document.getElementById('closePopup');
+
+    infoButton.addEventListener('click', () => {
+        popup.classList.remove('hidden');
+    });
+
+    closeButton.addEventListener('click', () => {
+        popup.classList.add('hidden');
+    });
+
+    // Close popup when clicking outside
+    popup.addEventListener('click', (e) => {
+        if (e.target === popup) {
+            popup.classList.add('hidden');
+        }
+    });
+
+    function togglePasswordVisibility() {
+        const input = document.getElementById('password');
+        const eye = document.getElementById('password-eye');
+        if (input.type === 'password') {
+            input.type = 'text';
+            eye.classList.remove('fa-eye');
+            eye.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            eye.classList.remove('fa-eye-slash');
+            eye.classList.add('fa-eye');
+        }
+    }
+</script>
+            <div class="mb-8">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" type="submit">Login</button>
+            </div>
+            <div class="text-center text-sm">
+                <p>Don't have an account? <a href="register.php" class="font-bold text-blue-500 hover:text-blue-800">Register</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup div for success message -->
+<div id="popup" class="popup">
+    <p class="text-xl font-semibold text-center text-green-600">Login successful!</p>
+</div>
+
+<script>
+    function togglePasswordVisibility() {
+        var passwordField = document.getElementById('password');
+        var eyeIcon = document.getElementById('password-eye');
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = "password";
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    }
+
+    // Show popup if login is successful
+    <?php if (isset($_SESSION["user_id"])): ?>
+        document.getElementById('popup').style.display = 'block';
+        setTimeout(function() {
+            window.location.href = 'index.php';
+        }, 2000); // Redirect after 2 seconds
+    <?php endif; ?>
+</script>
+
 </body>
 </html>
